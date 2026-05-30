@@ -1,0 +1,385 @@
+:root {
+  /* Warna sesuai Logo Kemenhub */
+  --primary-blue: #003366; /* Deep Blue */
+  --primary-yellow: #ffd700; /* Gold/Yellow */
+  --accent-cyan: #e6f0ff; /* Light tint for contrast */
+
+  --text-dark: #1e293b;
+  --text-light: #64748b;
+  --white: #ffffff;
+
+  /* Glass effect adjustment for darker theme */
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  background-color: #001a33; /* Fallback jika shader gagal */
+}
+
+/* Background Canvas Container */
+#canvas-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+/* Main Content Wrapper */
+.wrapper {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  padding: 20px;
+}
+
+/* Login Card */
+.login-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  padding: 40px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.3s ease;
+  position: relative;
+}
+
+/* Border accent halus warna emas */
+.login-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--primary-blue),
+    var(--primary-yellow),
+    var(--primary-blue)
+  );
+  border-radius: 24px 24px 0 0;
+}
+
+.login-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px 0 rgba(0, 51, 102, 0.25);
+}
+
+/* Logo Styling */
+.logo-container {
+  width: 110px;
+  height: 110px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Filter drop shadow untuk logo agar lebih menonjol */
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+}
+
+.logo-container img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.login-header h1 {
+  color: var(--primary-blue);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.login-header p {
+  color: var(--text-light);
+  font-size: 0.9rem;
+}
+
+/* Form Elements */
+.form-group {
+  width: 100%;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary-blue); /* Label warna biru */
+}
+
+.input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.input-wrapper i {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--primary-blue); /* Icon warna biru */
+  font-size: 1.2rem;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.form-input {
+  width: 100%;
+  padding: 14px 16px 14px 48px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: var(--text-dark);
+  background: rgba(255, 255, 255, 0.9);
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: var(--primary-yellow);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.2); /* Glow emas */
+}
+
+/* Mengubah warna icon saat fokus */
+.form-input:focus + i,
+.input-wrapper:focus-within i {
+  color: var(--primary-yellow);
+  opacity: 1;
+}
+
+.form-input::placeholder {
+  color: #94a3b8;
+}
+
+/* Password Toggle */
+.password-toggle {
+  position: absolute !important;
+  right: 0 !important;
+  top: 0 !important;
+  color: var(--primary-blue);
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.2s;
+}
+
+.password-toggle:hover {
+  color: var(--primary-yellow);
+}
+
+/* Options Row */
+.options-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 24px;
+  font-size: 0.85rem;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  color: var(--text-dark);
+}
+
+.remember-me input {
+  accent-color: var(--primary-blue);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.forgot-link {
+  color: var(--primary-blue);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.forgot-link:hover {
+  color: var(--primary-yellow);
+  text-decoration: underline;
+}
+
+/* Submit Button */
+.btn-submit {
+  width: 100%;
+  padding: 14px;
+  background: var(--primary-blue);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 51, 102, 0.2);
+}
+
+.btn-submit:hover {
+  background: #002244;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(0, 51, 102, 0.3);
+}
+
+/* Efek hover sedikit sentuhan emas */
+.btn-submit::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(rgba(255, 255, 255, 0.1), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.btn-submit:hover::after {
+  opacity: 1;
+}
+
+.btn-submit:active {
+  transform: translateY(0);
+}
+
+.btn-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Spinner */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff; /* Atau warna kuning */
+  border-top-color: var(--primary-yellow);
+  animation: spin 0.8s linear infinite;
+  display: none;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Toast Notification */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toast {
+  background: white;
+  padding: 16px 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 300px;
+  transform: translateX(120%);
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border-left: 4px solid;
+}
+
+.toast.show {
+  transform: translateX(0);
+}
+
+.toast.success {
+  border-left-color: var(--primary-blue);
+}
+.toast.success i {
+  color: var(--primary-blue);
+}
+
+.toast.error {
+  border-left-color: #ef4444;
+}
+.toast.error i {
+  color: #ef4444;
+}
+
+.toast-content h4 {
+  font-size: 0.9rem;
+  margin-bottom: 2px;
+  color: var(--text-dark);
+}
+.toast-content p {
+  font-size: 0.8rem;
+  color: var(--text-light);
+}
+
+/* Footer */
+.footer-info {
+  margin-top: 24px;
+  font-size: 0.75rem;
+  color: var(--text-light);
+  text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .login-card {
+    padding: 30px 20px;
+    width: 90%;
+  }
+  .logo-container {
+    width: 90px;
+    height: 90px;
+  }
+}
