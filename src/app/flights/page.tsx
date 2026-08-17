@@ -1,72 +1,115 @@
 "use client";
 
-import {
-  SidebarProvider,
-  SidebarTrigger,
-  SidebarInset,
-} from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/dashboard/app-sidebar";
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { FlightManagement } from "@/components/dashboard/flight-management";
+import { useEffect, useState, useCallback } from "react";
+import { Plane } from "lucide-react";
+
+type Flight = { id: string; tanggal: string; operator: string };
+type Maskapai = { id: string; nama: string; status: "active" | "inactive" };
 
 export default function FlightsPage() {
+  const [flights, setFlights] = useState<Flight[]>([]);
+  const [maskapaiList, setMaskapaiList] = useState<Maskapai[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  // Fetch maskapai (operators)
+  useEffect(() => {
+    document.title = "Flight Management | Kalimarau International";
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/dashboard/maskapai")
+      .then((r) => r.json())
+      .then((d: Maskapai[]) => setMaskapaiList(d))
+      .catch(() => {});
+  }, []);
+
+  const handleFlightsLoaded = useCallback((f: Flight[]) => {
+    setFlights(f);
+    setLoaded(true);
+  }, []);
+
+  const total = flights.length;
+
+  // Active Now = jumlah operator/maskapai yang status active
+  const activeNow = maskapaiList.filter((m) => m.status === "active").length;
+
+  // Inactive = jumlah maskapai status inactive
+  const inactiveCount = maskapaiList.filter((m) => m.status === "inactive").length;
+
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
         <AppSidebar />
         <SidebarInset className="flex-1 flex flex-col">
-          <DashboardHeader />
-
-          <main className="flex-1 overflow-auto">
+          <main className="flex-1 overflow-auto bg-muted/30">
             <div className="container mx-auto p-4 md:p-6 lg:p-8 space-y-6">
+
               {/* Page Header */}
-              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                {/* <div>
-                  <h1 className="text-3xl font-bold tracking-tight">
-                    Flight Management
-                  </h1>
-                  <p className="text-muted-foreground mt-1">
-                    Manage flight schedules, arrivals, and departures.
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h1 className="text-3xl font-bold tracking-tight">Flight Management</h1>
+                  <p className="text-muted-foreground mt-1 text-sm">
+                    Manage and monitor all active flight schedules across global routes.
                   </p>
-                </div> */}
-                <div className="flex items-center gap-2">
-                  <SidebarTrigger className="md:hidden" />
+                </div>
+                <FlightManagement.HeaderButtons />
+              </div>
+
+              {/* Stat Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {/* Total Flights */}
+                <div className="rounded-xl border bg-background p-5 shadow-sm flex items-start justify-between">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Total Flights</p>
+                    <div className="flex items-end gap-2 mt-1">
+                      <span className="text-4xl font-bold">{loaded ? total : "—"}</span>
+                      <span className="text-sm text-muted-foreground mb-1">flights</span>
+                    </div>
+                  </div>
+                  <div className="rounded-full bg-slate-100 dark:bg-slate-800 p-2 mt-1">
+                    <Plane className="h-5 w-5 text-slate-600 dark:text-slate-300" />
+                  </div>
+                </div>
+
+                {/* Active Now = operator active */}
+                <div className="rounded-xl border bg-background p-5 shadow-sm flex items-start justify-between">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Active Airlines</p>
+                    <div className="flex items-end gap-2 mt-1">
+                      <span className="text-4xl font-bold">{activeNow}</span>
+                      <span className="text-sm text-muted-foreground mb-1">operators</span>
+                    </div>
+                  </div>
+                  <div className="rounded-full bg-teal-100 dark:bg-teal-900/40 p-2 mt-1">
+                    <span className="flex h-5 w-5 items-center justify-center text-teal-600 dark:text-teal-400 font-bold text-lg">✦</span>
+                  </div>
+                </div>
+
+                {/* Inactive = maskapai tanpa penerbangan di bulan terpilih */}
+                <div className="rounded-xl border bg-background p-5 shadow-sm flex items-start justify-between">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Inactive Airlines</p>
+                    <div className="flex items-end gap-2 mt-1">
+                      <span className="text-4xl font-bold">{inactiveCount}</span>
+                      <span className="text-sm text-muted-foreground mb-1">operators</span>
+                    </div>
+                  </div>
+                  <div className="rounded-full bg-gray-100 dark:bg-gray-800 p-2 mt-1">
+                    <span className="flex h-5 w-5 items-center justify-center text-gray-500 font-bold text-base">⏸</span>
+                  </div>
                 </div>
               </div>
 
-              {/* Flight Management */}
-              <FlightManagement />
+              {/* Flight Management Table */}
+              <FlightManagement
+                onFlightsLoaded={handleFlightsLoaded}
+              />
             </div>
           </main>
-
-          {/* Footer */}
-          <footer className="border-t bg-muted/30 mt-auto">
-            <div className="container mx-auto px-4 md:px-6 lg:px-8 py-4">
-              <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-                <p>© 2026 Your Company. All rights reserved.</p>
-                <div className="flex items-center gap-4">
-                  <a
-                    href="#"
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Privacy Policy
-                  </a>
-                  <a
-                    href="#"
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Terms of Service
-                  </a>
-                  <a
-                    href="#"
-                    className="hover:text-foreground transition-colors"
-                  >
-                    Support
-                  </a>
-                </div>
-              </div>
-            </div>
-          </footer>
         </SidebarInset>
       </div>
     </SidebarProvider>

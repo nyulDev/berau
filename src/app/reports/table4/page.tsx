@@ -7,7 +7,6 @@ import {
   SidebarInset,
 } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/dashboard/app-sidebar";
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { Calendar } from "lucide-react";
 
 interface Flight {
@@ -290,8 +289,6 @@ export default function Table4Page() {
       <div className="min-h-screen flex w-full">
         <AppSidebar />
         <SidebarInset className="flex-1 flex flex-col">
-          <DashboardHeader />
-
           <main className="flex-1 overflow-auto">
             <div className="container mx-auto p-4 md:p-6 lg:p-8 space-y-6">
               {/* Filter Section */}

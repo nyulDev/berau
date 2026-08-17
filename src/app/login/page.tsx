@@ -31,6 +31,10 @@ export default function LoginPage() {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   useEffect(() => {
+    document.title = "Login | Kalimarau International";
+  }, []);
+
+  useEffect(() => {
     const initShader = () => {
       const container = document.getElementById("canvas-container");
       if (container && window.ShaderGradient) {

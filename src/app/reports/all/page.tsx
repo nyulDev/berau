@@ -7,7 +7,6 @@ import {
   SidebarInset,
 } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/dashboard/app-sidebar";
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -63,6 +62,7 @@ export default function ReportAllPage() {
   const currentMonth = (currentDate.getMonth() + 1).toString().padStart(2, "0");
 
   useEffect(() => {
+    document.title = "All Reports | Kalimarau International";
     fetchFlights();
     fetchMaskapai();
   }, []);
@@ -918,7 +918,6 @@ export default function ReportAllPage() {
       <div className="min-h-screen flex w-full">
         <AppSidebar />
         <SidebarInset className="flex-1 flex flex-col">
-          <DashboardHeader />
           <main className="flex-1 overflow-auto px-0">
             <div className="max-w-none px-0">
               {/* Filter Section */}

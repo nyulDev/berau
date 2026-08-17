@@ -4,6 +4,31 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import { prisma } from "@/lib/prisma";
 
+export async function GET() {
+  const session = await getServerSession(authOptions);
+  const sessionEmail =
+    session?.user && "email" in session.user
+      ? (session.user as any).email
+      : undefined;
+  if (!sessionEmail) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const users = await prisma.user.findMany({
+      select: { id: true, email: true, name: true, createdAt: true },
+      orderBy: { createdAt: "asc" },
+    });
+    return NextResponse.json(users);
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json(
+      { message: "Gagal mengambil data user" },
+      { status: 500 },
+    );
+  }
+}
+
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
   // next-auth Credentials + jwt session kadang tidak mengirim session.user.email
