@@ -14,7 +14,6 @@ export async function GET() {
         id: m.id,
         kode: m.kode,
         nama: m.nama,
-        kota_asal: m.kotaAsal,
         kontak: m.kontak,
         email: m.email,
         status: m.status,
