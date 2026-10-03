@@ -48,7 +48,15 @@ const navItems = [
       { title: "All Reports", url: "/reports/all" },
     ],
   },
-  { title: "LLAU", url: "/llau", icon: ClipboardList },
+  {
+    title: "LLAU Excel",
+    url: "/llau",
+    icon: ClipboardList,
+    subItems: [
+      { title: "Master LLAU", url: "/llau" },
+      { title: "Maskapai LLAU", url: "/llau/maskapai" },
+    ],
+  },
   { title: "Settings", url: "/settings", icon: Settings },
 ];
 
