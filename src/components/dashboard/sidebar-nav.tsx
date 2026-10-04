@@ -41,6 +41,7 @@ const navItems = [
     subItems: [
       { title: "Master LLAU", url: "/llau/master" },
       { title: "Maskapai LLAU", url: "/llau/maskapai" },
+      { title: "LLAU Tahunan", url: "/llau/tahunan" },
     ],
   },
   {
