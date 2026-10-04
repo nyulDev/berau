@@ -35,6 +35,15 @@ const navItems = [
   { title: "Operator",  url: "/operator", icon: Building2 },
   { title: "Flights",   url: "/flights",  icon: Plane },
   {
+    title: "LLAU Excel",
+    url: "/llau",
+    icon: ClipboardList,
+    subItems: [
+      { title: "Master LLAU", url: "/llau/master" },
+      { title: "Maskapai LLAU", url: "/llau/maskapai" },
+    ],
+  },
+  {
     title: "Reports",
     url: "/reports",
     icon: FileText,
@@ -46,15 +55,6 @@ const navItems = [
       { title: "Table 5", url: "/reports/table5" },
       { title: "Table 6", url: "/reports/table6" },
       { title: "All Reports", url: "/reports/all" },
-    ],
-  },
-  {
-    title: "LLAU Excel",
-    url: "/llau",
-    icon: ClipboardList,
-    subItems: [
-      { title: "Master LLAU", url: "/llau/master" },
-      { title: "Maskapai LLAU", url: "/llau/maskapai" },
     ],
   },
   { title: "Settings", url: "/settings", icon: Settings },
