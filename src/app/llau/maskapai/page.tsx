@@ -75,6 +75,16 @@ export default function MaskapaiLLAUPage() {
   const [filterTahun, setFilterTahun] = useState(String(now.getFullYear()));
   const [filterOperator, setFilterOperator] = useState("all");
 
+  // Reset operator filter saat bulan/tahun berubah
+  const handleBulanChange = (val: string) => {
+    setFilterBulan(val);
+    setFilterOperator("all");
+  };
+  const handleTahunChange = (val: string) => {
+    setFilterTahun(val);
+    setFilterOperator("all");
+  };
+
   useEffect(() => {
     document.title = "Maskapai LLAU | Kalimarau International";
     Promise.all([
@@ -86,11 +96,16 @@ export default function MaskapaiLLAUPage() {
     }).finally(() => setLoading(false));
   }, []);
 
-  // Daftar operator unik dari flights untuk filter dropdown
+  // Daftar operator unik — hanya yang ada pada bulan & tahun yang dipilih
   const operatorOptions = useMemo(() => {
-    const ops = Array.from(new Set(flights.map((f) => f.operator))).sort();
-    return ops;
-  }, [flights]);
+    const flightsBulanTahun = flights.filter((f) => {
+      const d = new Date(f.tanggal);
+      const matchBulan = filterBulan === "all" || d.getMonth() + 1 === parseInt(filterBulan);
+      const matchTahun = d.getFullYear() === parseInt(filterTahun);
+      return matchBulan && matchTahun;
+    });
+    return Array.from(new Set(flightsBulanTahun.map((f) => f.operator))).sort();
+  }, [flights, filterBulan, filterTahun]);
 
   // Filter flights berdasarkan bulan, tahun, dan operator
   const filtered = useMemo(() => {
@@ -198,7 +213,7 @@ export default function MaskapaiLLAUPage() {
                 {/* Filter Bulan */}
                 <div className="flex flex-col gap-1">
                   <label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Bulan</label>
-                  <Select value={filterBulan} onValueChange={setFilterBulan}>
+                  <Select value={filterBulan} onValueChange={handleBulanChange}>
                     <SelectTrigger className="w-40">
                       <SelectValue />
                     </SelectTrigger>
@@ -213,7 +228,7 @@ export default function MaskapaiLLAUPage() {
                 {/* Filter Tahun */}
                 <div className="flex flex-col gap-1">
                   <label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Tahun</label>
-                  <Select value={filterTahun} onValueChange={setFilterTahun}>
+                  <Select value={filterTahun} onValueChange={handleTahunChange}>
                     <SelectTrigger className="w-28">
                       <SelectValue />
                     </SelectTrigger>
