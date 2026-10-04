@@ -53,7 +53,7 @@ const navItems = [
     url: "/llau",
     icon: ClipboardList,
     subItems: [
-      { title: "Master LLAU", url: "/llau" },
+      { title: "Master LLAU", url: "/llau/master" },
       { title: "Maskapai LLAU", url: "/llau/maskapai" },
     ],
   },
