@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, Fragment } from "react";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/dashboard/app-sidebar";
 import {
@@ -279,7 +279,7 @@ export default function LLAUTahunanPage() {
                         const hasData = month.operators.length > 0;
 
                         return (
-                          <>
+                          <Fragment key={bulanLabel}>
                             {/* Baris operator */}
                             {hasData ? (
                               month.operators.map((row, idx) => (
@@ -337,7 +337,7 @@ export default function LLAUTahunanPage() {
 
                             {/* Separator antar bulan */}
                             <tr><td colSpan={11} className="border-0 h-1 bg-muted/40" /></tr>
-                          </>
+                          </Fragment>
                         );
                       })}
 
