@@ -208,9 +208,13 @@ export default function Table2Page() {
       group.datangCargo += parseFloat(flight.datangCargo || "0");
       group.berangkatCargo += parseFloat(flight.berangkatCargo || "0");
 
-      // Count pesawat (flights)
-      group.datangPesawat += 1; // Each flight counts as one arrival
-      group.berangkatPesawat += 1; // Each flight counts as one departure
+      // Count pesawat (flights) — sama dengan logika Table1: hanya hitung jika pergerakan > 0
+      if (parseFloat(flight.datangPergerakan || "0") > 0) {
+        group.datangPesawat += 1;
+      }
+      if (parseFloat(flight.berangkatPergerakan || "0") > 0) {
+        group.berangkatPesawat += 1;
+      }
     });
 
     // Now sum the grouped totals for overall totals
