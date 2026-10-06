@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const [flights, total] = await Promise.all([
       db.flight.findMany({
         orderBy: {
-          createdAt: "desc",
+          tanggal: "desc",
         },
         skip,
         take: limit,
