@@ -136,7 +136,7 @@ export default function LoginPage() {
       await signIn("credentials", {
         email: nextEmail,
         password: nextPassword,
-        callbackUrl: `${window.location.origin}/`,
+        callbackUrl: "/",
         redirect: true,
       });
 
