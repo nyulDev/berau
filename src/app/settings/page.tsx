@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
 import { Trash2, Eye, EyeOff, Users } from "lucide-react";
 
@@ -51,6 +53,9 @@ function formatDate(iso: string) {
 }
 
 export default function SettingsPage() {
+  const router = useRouter();
+  const { data: session, status } = useSession();
+  const role = (session?.user as any)?.role;
   // ── Users table ──────────────────────────────────────────────
   const [users, setUsers] = useState<User[]>([]);
   const [usersLoading, setUsersLoading] = useState(true);
@@ -75,6 +80,14 @@ export default function SettingsPage() {
     document.title = "Settings | Kalimarau International";
   }, []);
 
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.replace("/login");
+    } else if (status === "authenticated" && role === "user") {
+      router.replace("/");
+    }
+  }, [status, role, router]);
+
   const showToast = (title: string, message: string, variant: ToastVariant) => {
     toast({
       title,
@@ -88,6 +101,10 @@ export default function SettingsPage() {
     setUsersLoading(true);
     try {
       const res = await fetch("/api/dashboard/users");
+      if (res.status === 403) {
+        router.replace("/");
+        return;
+      }
       if (!res.ok) throw new Error("Gagal memuat data");
       const data: User[] = await res.json();
       setUsers(data);
@@ -96,11 +113,12 @@ export default function SettingsPage() {
     } finally {
       setUsersLoading(false);
     }
-  }, []);
+  }, [router]);
 
   useEffect(() => {
+    if (status !== "authenticated" || role === "user") return;
     fetchUsers();
-  }, [fetchUsers]);
+  }, [fetchUsers, status, role]);
 
   // ── Delete user ───────────────────────────────────────────────
   const handleDeleteConfirm = async () => {
@@ -215,6 +233,14 @@ export default function SettingsPage() {
   };
 
   const deleteTarget = users.find((u) => u.id === deleteTargetId);
+
+  if (status === "loading" || (status === "authenticated" && role === "user")) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <span className="text-sm text-muted-foreground">Memuat...</span>
+      </div>
+    );
+  }
 
   return (
     <SidebarProvider>

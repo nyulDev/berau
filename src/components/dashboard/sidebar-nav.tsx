@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import {
   LayoutDashboard,
   Building2,
@@ -64,6 +64,11 @@ const navItems = [
 
 export function SidebarNav() {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const role = (session?.user as any)?.role;
+  const visibleNavItems = navItems.filter(
+    (item) => item.title !== "Settings" || role === "admin",
+  );
 
   const isActive = (url: string) =>
     url === "/" ? pathname === "/" : pathname.startsWith(url);
@@ -74,7 +79,7 @@ export function SidebarNav() {
       <SidebarGroup className="flex-1 pt-2">
         <SidebarGroupContent>
           <SidebarMenu>
-            {navItems.map((item) =>
+            {visibleNavItems.map((item) =>
               item.subItems ? (
                 <Collapsible
                   key={item.title}
