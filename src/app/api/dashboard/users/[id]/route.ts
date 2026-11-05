@@ -5,14 +5,13 @@ import { prisma } from "@/lib/prisma";
 
 async function requireAdmin() {
   const session = await getServerSession(authOptions);
-  const sessionEmail =
-    session?.user && "email" in session.user
-      ? (session.user as any).email
-      : undefined;
-  if (!sessionEmail) return null;
+  const sessionUser = session?.user as any;
+  if (!sessionUser) return null;
 
   return prisma.user.findUnique({
-    where: { email: sessionEmail },
+    where: sessionUser.id
+      ? { id: sessionUser.id }
+      : { email: sessionUser.email },
     select: { id: true, role: true },
   });
 }
@@ -63,16 +62,15 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await getServerSession(authOptions);
-  const sessionEmail =
-    session?.user && "email" in session.user
-      ? (session.user as any).email
-      : undefined;
-  if (!sessionEmail) {
+  const sessionUser = session?.user as any;
+  if (!sessionUser) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
   const currentUser = await prisma.user.findUnique({
-    where: { email: sessionEmail },
+    where: sessionUser.id
+      ? { id: sessionUser.id }
+      : { email: sessionUser.email },
     select: { id: true, role: true },
   });
   if (currentUser?.role !== "admin") {
@@ -85,11 +83,7 @@ export async function DELETE(
   const { id } = await params;
 
   // Cegah user menghapus akunnya sendiri
-  const sessionUser = await prisma.user.findUnique({
-    where: { email: sessionEmail },
-    select: { id: true },
-  });
-  if (sessionUser?.id === id) {
+  if (currentUser.id === id) {
     return NextResponse.json(
       { message: "Tidak dapat menghapus akun yang sedang digunakan" },
       { status: 400 },

@@ -6,15 +6,39 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   const session = await getServerSession(authOptions);
-  const sessionEmail =
-    session?.user && "email" in session.user
-      ? (session.user as any).email
-      : undefined;
-  if (!sessionEmail) {
+  const sessionUser = session?.user as any;
+  if (!sessionUser) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
   try {
+    const currentUser = await prisma.user.findFirst({
+      where: sessionUser.id
+        ? { id: sessionUser.id }
+        : sessionUser.email
+          ? { email: sessionUser.email }
+          : { id: "__invalid_session_user__" },
+      select: { id: true, role: true },
+    });
+    if (!currentUser) {
+      return NextResponse.json({ message: "User tidak ditemukan" }, { status: 401 });
+    }
+
+    let isAdmin = currentUser.role === "admin";
+    if (!isAdmin) {
+      const adminCount = await prisma.user.count({ where: { role: "admin" } });
+      if (adminCount === 0) {
+        await prisma.user.update({
+          where: { id: currentUser.id },
+          data: { role: "admin" },
+        });
+        isAdmin = true;
+      }
+    }
+    if (!isAdmin) {
+      return NextResponse.json({ message: "Hanya admin yang dapat mengakses daftar user" }, { status: 403 });
+    }
+
     const users = await prisma.user.findMany({
       select: { id: true, email: true, name: true, role: true, createdAt: true },
       orderBy: { createdAt: "asc" },
@@ -31,12 +55,8 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
-  // next-auth Credentials + jwt session kadang tidak mengirim session.user.email
-  const email =
-    session?.user && "email" in session.user
-      ? (session.user as any).email
-      : undefined;
-  if (!email) {
+  const sessionUser = session?.user as any;
+  if (!sessionUser) {
     return NextResponse.json(
       { message: "Unauthorized", hint: "session.user.email kosong" },
       { status: 401 },
@@ -44,10 +64,23 @@ export async function POST(req: NextRequest) {
   }
 
   const currentUser = await prisma.user.findUnique({
-    where: { email },
-    select: { role: true },
+    where: sessionUser.id
+      ? { id: sessionUser.id }
+      : { email: sessionUser.email },
+    select: { id: true, role: true },
   });
-  if (currentUser?.role !== "admin") {
+  let isAdmin = currentUser?.role === "admin";
+  if (!isAdmin && currentUser) {
+    const adminCount = await prisma.user.count({ where: { role: "admin" } });
+    if (adminCount === 0) {
+      await prisma.user.update({
+        where: { id: currentUser.id },
+        data: { role: "admin" },
+      });
+      isAdmin = true;
+    }
+  }
+  if (!isAdmin) {
     return NextResponse.json(
       { message: "Hanya admin yang dapat membuat user" },
       { status: 403 },

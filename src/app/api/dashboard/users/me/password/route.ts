@@ -6,12 +6,8 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
-  // next-auth Credentials + jwt session kadang tidak mengirim session.user.email
-  const email =
-    session?.user && "email" in session.user
-      ? (session.user as any).email
-      : undefined;
-  if (!email) {
+  const sessionUser = session?.user as any;
+  if (!sessionUser) {
     return NextResponse.json(
       { message: "Unauthorized", hint: "session.user.email kosong" },
       { status: 401 },
@@ -37,7 +33,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({
+      where: sessionUser.id
+        ? { id: sessionUser.id }
+        : { email: sessionUser.email },
+    });
     if (!user) {
       return NextResponse.json(
         { message: "User tidak ditemukan" },
