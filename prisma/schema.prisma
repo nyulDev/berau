@@ -18,6 +18,7 @@ model User {
   email     String   @unique
   name      String?
   password  String
+  role      String   @default("user")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -44,10 +45,10 @@ model Maskapai {
 }
 
 model Flight {
-  id        String   @id @default(cuid())
-  tanggal   String
-  operator  String
-  transit   String?
+  id             String  @id @default(cuid())
+  tanggal        String
+  operator       String
+  transit        String?
   kapasitasKursi Int?
 
   // Datang fields
@@ -71,6 +72,6 @@ model Flight {
   berangkatBagasi       String?
   berangkatCargo        String?
   berangkatPergerakan   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 }

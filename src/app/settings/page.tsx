@@ -23,6 +23,7 @@ type User = {
   id: string;
   email: string;
   name: string | null;
+  role: "admin" | "user";
   createdAt: string;
 };
 
@@ -60,6 +61,7 @@ export default function SettingsPage() {
   const [createEmail, setCreateEmail] = useState("");
   const [createName, setCreateName] = useState("");
   const [createPassword, setCreatePassword] = useState("");
+  const [createRole, setCreateRole] = useState<"admin" | "user">("user");
   const [createLoading, setCreateLoading] = useState(false);
 
   // ── Change Password ───────────────────────────────────────────
@@ -120,6 +122,25 @@ export default function SettingsPage() {
     }
   };
 
+  const handleRoleChange = async (userId: string, role: "admin" | "user") => {
+    try {
+      const res = await fetch(`/api/dashboard/users/${userId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(data?.message ?? "Gagal mengubah role");
+
+      setUsers((prev) =>
+        prev.map((user) => (user.id === userId ? { ...user, role } : user)),
+      );
+      showToast("Berhasil", "Role user berhasil diubah", "success");
+    } catch (err: any) {
+      showToast("Gagal", err?.message ?? "Gagal mengubah role user", "error");
+    }
+  };
+
   const validateEmail = (email: string) => {
     const trimmed = email.trim().toLowerCase();
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed);
@@ -145,12 +166,14 @@ export default function SettingsPage() {
         email,
         name: name || null,
         password: createPassword,
+        role: createRole,
       });
 
       showToast("Berhasil", "User berhasil dibuat", "success");
       setCreateEmail("");
       setCreateName("");
       setCreatePassword("");
+      setCreateRole("user");
       fetchUsers();
     } catch (err: any) {
       showToast("Gagal", err?.message ?? "Gagal membuat user", "error");
@@ -254,6 +277,20 @@ export default function SettingsPage() {
                         onChange={(e) => setCreatePassword(e.target.value)}
                         required
                       />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-sm font-medium">Role</label>
+                      <select
+                        className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                        value={createRole}
+                        onChange={(e) =>
+                          setCreateRole(e.target.value as "admin" | "user")
+                        }
+                      >
+                        <option value="user">User Biasa</option>
+                        <option value="admin">Admin</option>
+                      </select>
                     </div>
 
                     <button
@@ -368,9 +405,10 @@ export default function SettingsPage() {
                 </div>
 
                 {/* Column headers */}
-                <div className="grid grid-cols-[1fr_1.5fr_1fr_auto] items-center gap-4 border-t px-6 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <div className="grid grid-cols-[1fr_1.5fr_0.7fr_1fr_auto] items-center gap-4 border-t px-6 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   <span>Nama</span>
                   <span>Email</span>
+                  <span>Role</span>
                   <span>Dibuat</span>
                   <span className="pr-1">Aksi</span>
                 </div>
@@ -390,7 +428,7 @@ export default function SettingsPage() {
                     users.map((user) => (
                       <div
                         key={user.id}
-                        className="grid grid-cols-[1fr_1.5fr_1fr_auto] items-center gap-4 px-6 py-4 transition-colors hover:bg-muted/40"
+                        className="grid grid-cols-[1fr_1.5fr_0.7fr_1fr_auto] items-center gap-4 px-6 py-4 transition-colors hover:bg-muted/40"
                       >
                         {/* Nama + avatar */}
                         <div className="flex items-center gap-3 min-w-0">
@@ -408,6 +446,20 @@ export default function SettingsPage() {
                         <span className="truncate text-sm text-muted-foreground">
                           {user.email}
                         </span>
+
+                        <select
+                          className="w-full rounded-md border bg-background px-2 py-1.5 text-sm"
+                          value={user.role}
+                          onChange={(e) =>
+                            handleRoleChange(
+                              user.id,
+                              e.target.value as "admin" | "user",
+                            )
+                          }
+                        >
+                          <option value="user">User</option>
+                          <option value="admin">Admin</option>
+                        </select>
 
                         {/* Tanggal */}
                         <span className="text-sm text-muted-foreground">

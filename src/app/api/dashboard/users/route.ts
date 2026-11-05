@@ -16,7 +16,7 @@ export async function GET() {
 
   try {
     const users = await prisma.user.findMany({
-      select: { id: true, email: true, name: true, createdAt: true },
+      select: { id: true, email: true, name: true, role: true, createdAt: true },
       orderBy: { createdAt: "asc" },
     });
     return NextResponse.json(users);
@@ -43,6 +43,17 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  const currentUser = await prisma.user.findUnique({
+    where: { email },
+    select: { role: true },
+  });
+  if (currentUser?.role !== "admin") {
+    return NextResponse.json(
+      { message: "Hanya admin yang dapat membuat user" },
+      { status: 403 },
+    );
+  }
+
   try {
     const body = await req.json();
     const email = String(body?.email ?? "")
@@ -50,6 +61,7 @@ export async function POST(req: NextRequest) {
       .toLowerCase();
     const name = body?.name ? String(body.name) : null;
     const password = String(body?.password ?? "");
+    const role = body?.role === "admin" ? "admin" : "user";
 
     if (!email) {
       return NextResponse.json(
@@ -88,6 +100,7 @@ export async function POST(req: NextRequest) {
         email,
         name,
         password: hashed,
+        role,
       },
     });
 
