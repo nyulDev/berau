@@ -89,6 +89,7 @@ const tableHTML = `<style>
 export default function Table6Page() {
   const [flights, setFlights] = useState<Flight[]>([]);
   const [selectedMonth, setSelectedMonth] = useState<string>("");
+  const [perusahaanExpedisi, setPerusahaanExpedisi] = useState("SN Cargo, CDA");
 
   useEffect(() => {
     fetchFlights();
@@ -143,6 +144,18 @@ export default function Table6Page() {
     return date.toLocaleDateString("id-ID", { month: "long", year: "numeric" });
   };
 
+  const escapeHTML = (value: string) =>
+    value.replace(/[&<>"']/g, (character) => {
+      const entities: Record<string, string> = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      };
+      return entities[character];
+    });
+
   const generateTableRows = () => {
     // Group flights by operator and calculate cargo totals
     const groupedFlights = filteredFlights.reduce(
@@ -168,7 +181,7 @@ export default function Table6Page() {
         <td>${index + 1}</td>
         <td>${operator}</td>
         <td>0</td>
-        <td>SN Cargo, CDA</td>
+        <td>${escapeHTML(perusahaanExpedisi)}</td>
         <td>0</td>
         <td>${data.datangCargo}</td>
         <td>0</td>
@@ -212,6 +225,22 @@ export default function Table6Page() {
                     Menampilkan {filteredFlights.length} dari {flights.length}{" "}
                     penerbangan
                   </div>
+                </div>
+                <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
+                  <label
+                    htmlFor="perusahaan-expedisi"
+                    className="font-medium"
+                  >
+                    Perusahaan Expedisi:
+                  </label>
+                  <input
+                    id="perusahaan-expedisi"
+                    type="text"
+                    value={perusahaanExpedisi}
+                    onChange={(e) => setPerusahaanExpedisi(e.target.value)}
+                    placeholder="Masukkan nama perusahaan expedisi"
+                    className="w-full max-w-md px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
                 </div>
               </div>
 

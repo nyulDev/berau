@@ -55,6 +55,7 @@ const navItems = [
       { title: "Table 4", url: "/reports/table4" },
       { title: "Table 5", url: "/reports/table5" },
       { title: "Table 6", url: "/reports/table6" },
+      { title: "LLAU Word", url: "/reports/llau-word" },
       { title: "All Reports", url: "/reports/all" },
     ],
   },
